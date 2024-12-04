@@ -1,0 +1,60 @@
+\documentclass[tikz,border=10pt]{standalone}
+
+% \usetikzlibrary{calc,positioning,intersections}
+% 
+% \begin{document}
+% \begin{tikzpicture}
+% 
+% % Define the coordinates for your path
+% \coordinate (A) at (0, 0);
+% \coordinate (B) at (2, 1);
+% \coordinate (E) at (3, 1);
+% \coordinate (G) at (2, 2);
+% \coordinate (C) at (0, 2);
+% 
+% % Stroke draws both inside and outside of path
+% \path[draw,thin,save path=\cshape] (A) -- (B) -- (E) -- (G) -- (C) -- cycle;
+% \path[fill=red!50,use path=\cshape];
+% \fill[white] (0.2, 0.3) -- (0.8, 0.6) -- (0.4, 1) -- cycle;
+% \def\lenTN{3.5} % assume ! (it is infact computed)
+% \path[draw=black,thin,use path=\cshape]; % display purpose only
+% \path[draw,line width=\lenTN,blue!50,opacity=0.6,use path=\cshape];
+
+\usetikzlibrary{calc,positioning,intersections,decorations}
+\pgfdeclaredecoration{stroke outside path}{initial}{%
+  \state{initial}[width=\pgfdecoratedinputsegmentlength/100,next state=iterate]
+  {
+    \pgfpathmoveto{\pgfqpoint{0pt}{.5\pgflinewidth}}
+  }%
+  \state{iterate}[width=\pgfdecoratedinputsegmentlength/100]
+  {
+    \pgfpathlineto{\pgfqpoint{.5\pgflinewidth}{.5\pgflinewidth}}
+  }%
+  \state{final}{%
+    \pgfpathlineto{\pgfpointadd{\pgfqpoint{\pgflinewidth}{.5\pgflinewidth}}{\pgfpointdecoratedpathlast}}
+  }%
+}%
+
+
+\begin{document}
+\begin{tikzpicture}
+
+% Define the coordinates for your path
+\coordinate (A) at (0, 0);
+\coordinate (B) at (2, 1);
+\coordinate (E) at (3, 1);
+\coordinate (G) at (2, 2);
+\coordinate (C) at (0, 2);
+
+% Stroke draws both inside and outside of path
+\path[fill=red!50] (A) -- (B) -- (E) -- (G) -- (C) -- cycle;
+\fill[white] (0.2, 0.3) -- (0.8, 0.6) -- (0.4, 1) -- cycle;
+\def\lenTN{3.5} % assume ! (it is infact computed)
+% \path[draw=black,thin,use path=\cshape]; % display purpose only
+\draw [decoration=stroke outside path, decorate, line width = \lenTN] (A) -- (B) -- (E) -- (G) -- (C) -- cycle;
+\draw [red](A) -- (B) -- (E) -- (G) -- (C) -- cycle;
+
+
+
+\end{tikzpicture}
+\end{document}

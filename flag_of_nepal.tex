@@ -1,0 +1,180 @@
+% https://0xc.de/flags/nepal/
+\documentclass[tikz,border=0.5cm]{standalone}
+\usetikzlibrary{positioning,calc,shapes.geometric,intersections,through,decorations.pathmorphing,decorations.shapes}
+\usetikzlibrary{ext.paths.arcto}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=2]
+
+% Define colors
+\definecolor{nepalred}{RGB}{206,17,38} % Crimson red
+\definecolor{nepalblue}{RGB}{0,56,168} % Blue border
+
+% Dimensions of the triangles
+\def\base{3} % Base of the small triangle
+\def\height{4} % Height of the small triangle
+
+\coordinate (A) at (0,0);
+\coordinate (B) at (\base,0);
+\coordinate (C) at (0,\height);
+\coordinate (D) at (0,\base);
+\coordinate (E) at ({3-3/sqrt(2)},{3/sqrt(2)});
+\coordinate (F) at (0,{3/sqrt(2)});
+\coordinate (G) at (3,{3/sqrt(2)});
+\coordinate (H) at (3/4,0);
+\coordinate (I) at (3/4,{3 + 3/4/sqrt(2)}); % note do not use command slash in sqrt
+
+% \fill[nepalred,save path=\lowertri] (A) -- (B) -- (D) -- cycle;
+% \fill[nepalred,save path=\uppertri] (C) |- (E) -- (G) -- cycle;
+
+% % Labelling nodes for convenience
+% \node at (A) {A};
+% \node at (B) {B};
+% \node at (C) {C};
+% \node at (D) {D};
+% \node at (E) {E};
+% \node at (F) {F};
+% \node at (G) {G};
+% \node at (H) {H};
+% \node at (I) {I};
+
+\coordinate (J) at ($ (C)!0.5!(F) $);
+\coordinate (K) at ($ (C)!0.5!(G) $);
+
+% \node at (J) {J};
+% \node at (K) {K};
+
+\path[name path=JK] (J) -- (K);
+
+\path[draw=none,thin,blue!40,dashed,name path=JK] (J) -- (K);
+\path[draw=none,thin,blue!40,dashed,name path=HI] (H) -- (I);
+
+% % hide
+% \path[name path=JG] (J) -- (G); % this path is useful only when using path to find intersection
+% \path[name path=DB] (D) -- (B);
+
+% Find and name intersection
+\path[name intersections={of=JK and HI, by=L}];
+\coordinate (M) at (intersection of J--G and H--I); % note H--I syntax is new
+\coordinate (X) at (intersection of D--B and H--I); %
+
+% % hide: Draw and mark the midpoint
+% \draw[fill=white] (L) circle (0.5pt) node[very thin,below] {L};
+% \draw[fill=white] (M) circle (0.5pt) node[very thin,below] {M};
+% \draw[fill=white] (X) circle (0.5pt) node[very thin,below] {X};
+
+\draw let \p1=($(M)-(X)$), \n1={veclen(\x1,\y1)} in coordinate (N) at ($(M)!\n1/sqrt(2)!(X)$);
+% % hide
+% \draw[fill=white] (N) circle (0.5pt) node[very thin,below] {N};
+
+%% difficult to clip the shapes with nodes
+% \node[name path=CimpM,draw,circle through=(X)] at (M) {}; % uses tikzlibrary "through"
+% \node[name path=CimpL,draw,circle through=(N)] at (L) {};
+% \node[name path=CimpN,draw,circle through=(M)] at (N) {};
+
+\path[draw=none,name path=CimpM] let \p1 = ($(M) - (X)$), \n1={veclen(\x1,\y1)} in \pgfextra{\xdef\rMX{\n1}} (M) circle [radius=\rMX];
+\path[draw=none,name path=CimpL] let \p1 = ($(L) - (N)$), \n1={veclen(\x1,\y1)} in \pgfextra{\xdef\rLN{\n1}} (L) circle [radius=\rLN];
+\path[draw=none,name path=CimpN] let \p1 = ($(N) - (M)$), \n1={veclen(\x1,\y1)} in \pgfextra{\xdef\rNM{\n1}} (N) circle [radius=\rNM];
+
+%% Complex filling tricks in TikZ: https://tex.stackexchange.com/questions/614043/how-to-draw-diagram-of-circles-and-curves-with-pattern-filled-intersections-usi 
+% \begin{scope}
+% \path[clip] let \p1 = ($(N) - (M)$) in (M) circle [radius={veclen(\x1,\y1)}];
+% \path[fill=white] let \p1 = ($(L) - (N)$) in (L) circle [radius={veclen(\x1,\y1)}];
+% \end{scope}
+
+% % hide
+% \draw (J) -- (L);
+% \draw (N) |- (J);
+
+\path [draw=none,name path=OM] ($(C)!(M)!(F)$) coordinate (O) -- (M);
+% \node at (O) {O};
+\path [draw=none,name path=ExtendM] (M) -- +({\base-1},0);
+\path [draw=none,name intersections={of=OM and CimpM, by=P}];
+\path [draw=none,name intersections={of=ExtendM and CimpM, by=Q}];
+
+% % hide
+% \draw[fill] (P) circle (0.5pt) node {P};
+% \draw[fill] (Q) circle (0.5pt) node {Q};
+
+\path [draw=none,name intersections={of=CimpN and CimpL, name=cints}]; % circle intersections small circle
+% % hide
+% \foreach \n in {1,2} {
+%     \fill[black] (cints-\n) circle (0.5pt) node[font=\tiny,below] {cs\n};
+% }
+
+\path[draw=none,name path=c1--c2] (cints-1) -- (cints-2); 
+\path[draw=none,name path=MN] (M) -- (N); 
+
+\path[draw=none,name intersections={of=c1--c2 and MN, by=T}];
+
+% % hide
+% \draw[fill] (T) circle (0.5pt) node {T};
+
+% % hide
+% \draw (T) circle (0.5pt);
+
+% a larger concentric circle
+
+\path[name path=segTN] let \p1 = ($(T) - (N)$), \n1 = {veclen(\x1,\y1)} in \pgfextra{\xdef\lenTN{\n1}} (T) -- (N); % radius/border
+\path[name path=segTM] let \p1 = ($(T) - (M)$), \n1 = {veclen(\x1,\y1)} in \pgfextra{\xdef\lenTM{\n1}} (T) -- (M);
+\path[draw=none,name path=CimpTB] (T) circle (\lenTN+\lenTM);
+\path[draw=none,name path=CimpTS] (T) circle (\lenTM);
+
+\path [draw=none,name intersections={of=CimpTB and CimpL, name=cintb}]; % circle intersections big circle
+% % hide
+% \foreach \n in {1,2} {
+%     \fill[black] (cintb-\n) circle (0.5pt) node[font=\tiny,below] {cb\n};
+% }
+
+% Circle intersecting circle
+\path [draw=none,name intersections={of=CimpL and CimpM, name=CI}];
+
+% % hide: Draw the intersections
+% \foreach \n in {1,2} {
+%     \fill[black] (CI-\n) circle (0.5pt) node[font=\tiny,below] {CI\n};
+% }
+
+\path[save path =\flagB] (A) -- (B) -- (E) -- (G) -- (C) -- cycle;
+\draw[nepalblue,line width=\lenTN*2,use path =\flagB];
+\fill[nepalred,use path=\flagB];
+
+% Moon
+\draw[draw=none,fill=white,save path=\moon] (CI-1) arc to[radius=(\rNM)](CI-2)
+  arc to[radius=(\rLN),clockwise](CI-1) ;
+
+\def\teeth{16}
+\def\innerR{\lenTM}
+% Add the lengths
+\pgfmathsetmacro{\tempLength}{\lenTM + \lenTN}
+% Pass the result to \def
+\def\outerR{\tempLength pt}
+\pgfmathsetmacro\angle{360/\teeth}
+
+% best way to draw a spiked circle (no open path): https://tex.stackexchange.com/a/731097/133229
+\draw[draw=none,save path=\star] ($(T)+(0:\innerR)$) \foreach \i in {1,...,\teeth} { -- ($(T)+({(\i-0.5)*360/\teeth}:\outerR)$) -- ($(T)+(\i*360/\teeth:\innerR)$)} -- cycle;
+
+\begin{scope}
+\clip ($(T)+(\outerR,-\outerR)$) rectangle ($(T)+(-\outerR,\outerR)$) ($(T)+(-\outerR,-\outerR)$) -- ($(T)+(-\outerR,0)$) -- (CI-1) arc to[radius=0.5*(\rNM+\rLN)] (CI-2) -- ($(T) + (\outerR,0)$) -- ($(T)+(\outerR,-\outerR)$) -- cycle; %replace \clip with \fill[red] to see area
+\fill[white, use path=\star];
+\end{scope}
+
+% Sun
+% \coordinate (U) at ($ (A)!0.5!(F) $);
+\coordinate (W) at (3/4,{3/2/sqrt(2)});
+
+\def\teeth{12}
+\def\innerR{\rNM}
+\def\outerR{\rLN}
+\pgfmathsetmacro\angle{360/\teeth)}
+
+% not a good way to draw a spiked circle (leaves open path) 
+\fill[white] (W) circle [radius=\innerR];
+\fill[white]
+  \foreach \i in {1,2,...,\teeth} {%
+     [rotate=(\i-1)*\angle]  ($(W) + (0:\innerR)$) -- ($(W) + (\angle*1/2:\outerR)$) -- ($(W) + (\angle:\innerR)$)
+   };
+
+\end{tikzpicture}
+
+\end{document}
